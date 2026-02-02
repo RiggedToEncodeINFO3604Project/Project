@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}AI Web Portal{% endblock %}
+
+{% block page %}AI Web Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <h4>AI Chatbot</h4>
+        <div id="chat-messages" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="input-field">
+            <input type="text" id="user-message" placeholder="Type your message here...">
+            <button class="btn waves-effect waves-light" id="send-btn">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+document.getElementById('user-message').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+function sendMessage() {
+    const message = document.getElementById('user-message').value.trim();
+    if (!message) return;
+
+    // Add user message to chat
+    addMessage('You: ' + message, 'user');
+
+    // Clear input
+    document.getElementById('user-message').value = '';
+
+    // Send to server
+    fetch('/ai-portal/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.response) {
+            addMessage('AI: ' + data.response, 'ai');
+        } else if (data.error) {
+            addMessage('Error: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        addMessage('Error: ' + error.message, 'error');
+    });
+}
+
+function addMessage(text, type) {
+    const messagesDiv = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = text;
+    messageDiv.style.marginBottom = '10px';
+    if (type === 'user') {
+        messageDiv.style.fontWeight = 'bold';
+    } else if (type === 'ai') {
+        messageDiv.style.color = 'blue';
+    } else if (type === 'error') {
+        messageDiv.style.color = 'red';
+    }
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+</script>
+{% endblock %}
