@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 import os
-import google.genai as genai
+import google.generativeai as genai
 
 ai_portal_views = Blueprint('ai_portal_views', __name__, template_folder='../templates')
 
