@@ -17,5 +17,5 @@ python-dotenv==1.0.1
 pytz==2025.2
 rich==13.4.2
 mysqlclient==2.2.7
-google-generativeai
+google-genai
 
