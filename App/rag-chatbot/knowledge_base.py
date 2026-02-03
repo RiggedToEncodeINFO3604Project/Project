@@ -111,3 +111,44 @@ SECTIONS: list[Section] = [
         ),
     ),
 ]
+
+
+# Functions to access the Knowledge Base
+def get_full_knowledge_base() -> str:
+    """Return the entire KB as one string — injected into every Gemini prompt."""
+    return "\n\n---\n\n".join(
+        f"### {s.title}\n{s.content}" for s in SECTIONS
+    )
+
+
+@dataclass
+class RelevantContext:
+    matched:   list[str]   # titles of sections that matched
+    full_text: str         # the concatenated text of those sections
+
+
+def get_relevant_context(query: str) -> RelevantContext:
+    """
+    Lightweight keyword pre-filter.  Scores each section, returns the ones
+    with ≥1 hit sorted by score.  Falls back to the full KB when nothing
+    matches.
+    """
+    lower = query.lower()
+
+    scored = [
+        (section, sum(1 for kw in section.keywords if kw in lower))
+        for section in SECTIONS
+    ]
+
+    matched = sorted(
+        (sec for sec, hits in scored if hits > 0),
+        key=lambda sec: sum(1 for kw in sec.keywords if kw in lower),
+        reverse=True,
+    )
+
+    selected = matched if matched else SECTIONS
+
+    return RelevantContext(
+        matched=[s.title for s in selected],
+        full_text="\n\n---\n\n".join(f"### {s.title}\n{s.content}" for s in selected),
+    )
