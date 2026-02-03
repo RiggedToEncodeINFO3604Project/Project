@@ -3,9 +3,10 @@ services:
 - type: web
   name: flask-postgres-api
   env: python
+  runtime: python311
   repo: https://github.com/RiggedToEncodeINFO3604Project/Project.git
   plan: free
-  branch: main
+  branch: AI-Branch
   healthCheckPath: /health
   buildCommand: "pip install -r requirements.txt"
   startCommand: "gunicorn wsgi:app"
