@@ -1,22 +1,285 @@
 {% extends "layout.html" %}
 
-{% block title %}AI Web Portal{% endblock %}
+{% block title %}AI Support Portal{% endblock %}
 
-{% block page %}AI Web Portal{% endblock %}
+{% block page %}AI Support Portal{% endblock %}
 
 {% block content %}
+<style>
+nav { display: none; }
+</style>
 <div class="row">
-    <div class="col s12">
-        <h4>AI Chatbot</h4>
-        <div id="chat-messages" style="height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+    <div class="col s12 m8 offset-m2">
+        <h4 class="center-align">AI Support Staff</h4>
+        <div id="chat-messages" class="chat-container">
             <!-- Messages will appear here -->
+            <div id="thinking-indicator" class="thinking-indicator">
+                <span class="thinking-text">Thinking</span>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
         </div>
-        <div class="input-field">
+        <div class="input-field message-input-field">
             <input type="text" id="user-message" placeholder="Type your message here...">
-            <button class="btn waves-effect waves-light" id="send-btn">Send</button>
+            <button class="btn waves-effect waves-light blue" id="send-btn">Send</button>
         </div>
     </div>
 </div>
+
+<!-- Dark Mode Toggle -->
+<button id="dark-mode-toggle" class="btn-floating btn-large waves-effect waves-light" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    <i class="material-icons">brightness_6</i>
+</button>
+
+<style>
+.chat-container {
+    height: 500px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+}
+
+.message-wrapper {
+    margin-bottom: 15px;
+}
+
+.message-wrapper.user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 70%;
+    margin-left: auto;
+    padding-right: 5px;
+}
+
+.message-label {
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.message-label.you {
+    color: #6bb3ff;
+    text-align: right;
+    display: block;
+    width: 100%;
+    margin-right: 10px;
+}
+
+.message-label.support {
+    color: #aaa;
+    text-align: left;
+}
+
+.message-label.error {
+    color: #ff6b6b;
+    text-align: left;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.message strong {
+    font-weight: 700;
+}
+
+.message em {
+    font-style: italic;
+}
+
+.message strong.super-bold {
+    font-weight: 900;
+    color: #000;
+}
+
+.message.user {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.message-input-field {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 25px;
+    padding: 5px 15px;
+    margin-bottom: 20px;
+}
+
+.message-input-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 10px 0;
+    font-size: 1rem;
+}
+
+.message-input-field input::placeholder {
+    color: #aaa;
+}
+
+.message-input-field .btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.dark-mode .message-input-field .btn:disabled {
+    background-color: #444444;
+    color: #888888;
+}
+
+.message.ai {
+    background-color: #e9ecef;
+    color: #333;
+    margin-right: auto;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    margin-right: auto;
+}
+
+.thinking-indicator {
+    display: none;
+    align-items: center;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.thinking-text {
+    margin-right: 8px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #666;
+    margin: 0 2px;
+    margin-top: 4px;
+    animation: thinking 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes thinking {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Dark Mode Styles */
+.dark-mode {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
+.dark-mode body {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode .container {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-mode h4 {
+    color: #ffffff;
+}
+
+.dark-mode .chat-container {
+    background-color: #1e1e1e;
+    border-color: #333;
+    color: #ffffff;
+}
+
+.dark-mode .message.user {
+    background-color: #007bff;
+    color: white;
+}
+
+.dark-mode .message.ai {
+    background-color: #333;
+    color: #ffffff;
+}
+
+.dark-mode .message.error {
+    background-color: #d32f2f;
+    color: #ffffff;
+}
+
+.dark-mode .input-field input {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border-bottom: 1px solid #555;
+}
+
+.dark-mode .input-field input::placeholder {
+    color: #bbb;
+}
+
+.dark-mode .input-field label {
+    color: #bbb;
+}
+
+.dark-mode .message-input-field {
+    background-color: #333;
+}
+
+.dark-mode .message-input-field input {
+    color: #ffffff;
+    background-color: transparent;
+}
+
+.dark-mode .btn {
+    background-color: #007bff;
+}
+
+.dark-mode .btn:hover {
+    background-color: #0056b3;
+}
+
+.dark-mode .thinking-indicator {
+    color: #aaa;
+}
+
+.dark-mode .dot {
+    background-color: #aaa;
+}
+
+.dark-mode .dot {
+    background-color: #bbb;
+}
+
+.dark-mode #dark-mode-toggle {
+    background-color: #333;
+    color: #ffffff;
+}
+
+.dark-mode #dark-mode-toggle:hover {
+    background-color: #555;
+}
+</style>
 
 <script>
 document.getElementById('send-btn').addEventListener('click', sendMessage);
@@ -26,12 +289,65 @@ document.getElementById('user-message').addEventListener('keypress', function(e)
     }
 });
 
+// Dark Mode Toggle
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+const body = document.body;
+
+darkModeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    const icon = darkModeToggle.querySelector('i');
+    if (body.classList.contains('dark-mode')) {
+        icon.textContent = 'brightness_7';
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        icon.textContent = 'brightness_6';
+        localStorage.setItem('darkMode', 'disabled');
+    }
+});
+
+// Check for saved dark mode preference
+if (localStorage.getItem('darkMode') === 'enabled') {
+    body.classList.add('dark-mode');
+    darkModeToggle.querySelector('i').textContent = 'brightness_7';
+}
+
+// Parse markdown-style text formatting
+function parseMarkdown(text) {
+    if (!text) return '';
+    
+    // First, escape HTML to prevent XSS
+    let escaped = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Parse super bold: ***text*** -> <strong class="super-bold">text</strong>
+    escaped = escaped.replace(/\*\*\*(.+?)\*\*\*/g, '<strong class="super-bold">$1</strong>');
+    
+    // Parse bold: **text** -> <strong>text</strong>
+    escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Parse italics: *text* -> <em>text</em>
+    escaped = escaped.replace(/(?!<\/strong>)\s*\*([\s\S]*?)\*/g, '<em>$1</em>');
+    
+    return escaped;
+}
+
 function sendMessage() {
     const message = document.getElementById('user-message').value.trim();
     if (!message) return;
 
+    // Disable send button
+    const sendBtn = document.getElementById('send-btn');
+    sendBtn.disabled = true;
+
     // Add user message to chat
-    addMessage('You: ' + message, 'user');
+    addMessage(message, 'user');
+
+    // Move and show thinking indicator after user message
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.appendChild(document.getElementById('thinking-indicator'));
+    document.getElementById('thinking-indicator').style.display = 'flex';
 
     // Clear input
     document.getElementById('user-message').value = '';
@@ -46,31 +362,100 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide thinking indicator
+        document.getElementById('thinking-indicator').style.display = 'none';
         if (data.response) {
-            addMessage('AI: ' + data.response, 'ai');
+            addthinkingMessage(data.response, 'ai');
         } else if (data.error) {
-            addMessage('Error: ' + data.error, 'error');
+            addMessage(data.error, 'error');
         }
     })
     .catch(error => {
-        addMessage('Error: ' + error.message, 'error');
+        // Hide thinking indicator
+        document.getElementById('thinking-indicator').style.display = 'none';
+        addMessage(error.message, 'error');
+        // Re-enable send button on error
+        document.getElementById('send-btn').disabled = false;
     });
+}
+
+function isAtBottom(element) {
+    return element.scrollTop + element.clientHeight >= element.scrollHeight - 10;
 }
 
 function addMessage(text, type) {
     const messagesDiv = document.getElementById('chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.textContent = text;
-    messageDiv.style.marginBottom = '10px';
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'message-wrapper ' + type;
+    
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'message-label ' + type;
     if (type === 'user') {
-        messageDiv.style.fontWeight = 'bold';
+        labelDiv.textContent = 'You';
     } else if (type === 'ai') {
-        messageDiv.style.color = 'blue';
+        labelDiv.textContent = 'Support';
     } else if (type === 'error') {
-        messageDiv.style.color = 'red';
+        labelDiv.textContent = 'Error';
     }
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + type;
+    // Only apply markdown for AI and error messages
+    if (type === 'ai' || type === 'error') {
+        messageDiv.innerHTML = parseMarkdown(text);
+    } else {
+        messageDiv.textContent = text;
+    }
+    
+    wrapperDiv.appendChild(labelDiv);
+    wrapperDiv.appendChild(messageDiv);
+    messagesDiv.appendChild(wrapperDiv);
+    if (isAtBottom(messagesDiv)) {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+}
+
+function addthinkingMessage(text, type) {
+    const messagesDiv = document.getElementById('chat-messages');
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.className = 'message-wrapper ' + type;
+    
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'message-label ' + type;
+    if (type === 'user') {
+        labelDiv.textContent = 'You';
+    } else if (type === 'ai') {
+        labelDiv.textContent = 'Support';
+    } else if (type === 'error') {
+        labelDiv.textContent = 'Error';
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message ' + type;
+    
+    wrapperDiv.appendChild(labelDiv);
+    wrapperDiv.appendChild(messageDiv);
+    messagesDiv.appendChild(wrapperDiv);
+    
+    let index = 0;
+    const interval = setInterval(() => {
+        if (index < text.length) {
+            // Check if user was at bottom BEFORE adding the character
+            const wasAtBottom = isAtBottom(messagesDiv);
+            // Apply markdown parsing incrementally
+            const partialText = text.substring(0, index + 1);
+            messageDiv.innerHTML = parseMarkdown(partialText);
+            index++;
+            // If user was at bottom before, scroll to bottom after adding
+            if (wasAtBottom) {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        } else {
+            clearInterval(interval);
+            // Re-enable send button when typing is done
+            document.getElementById('send-btn').disabled = false;
+        }
+    }, 8);
 }
 </script>
 {% endblock %}
