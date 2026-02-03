@@ -113,7 +113,7 @@ SECTIONS: list[Section] = [
 ]
 
 
-# Functions to access the Knowledge Base
+# Public API: Functions to access the Knowledge Base
 def get_full_knowledge_base() -> str:
     """Return the entire KB as one string — injected into every Gemini prompt."""
     return "\n\n---\n\n".join(
